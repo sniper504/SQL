@@ -1,0 +1,53 @@
+CREATE TABLE Subjects (
+    id_subject int PRIMARY KEY IDENTITY(1,1),
+    name_subject varchar(100) not null,
+    hours int not null
+);
+
+CREATE TABLE Groups (
+    id_group int PRIMARY KEY IDENTITY(1,1),
+    group_name varchar(50) not null,
+    course int not null
+);
+
+CREATE TABLE Students (
+    id_student int PRIMARY KEY IDENTITY(1000,1),
+    name varchar(20) not null,
+    surname varchar(50) not null,
+    last_name varchar(50),
+    birthday DATE not null,
+    id_group int not null,
+    FOREIGN KEY (id_group) REFERENCES Groups(id_group)
+);
+
+
+CREATE TABLE Plans (
+    id_group int not null,
+    id_subject int not null,
+    PRIMARY KEY (id_group, id_subject),
+    FOREIGN KEY (id_group) REFERENCES Groups(id_group),
+    FOREIGN KEY (id_subject) REFERENCES Subjects(id_subject)
+);
+
+
+insert into Groups(group_name, course) VALUES ('ПО135',1),('ПО235',2),('ПО335',3);
+insert into Subjects(name_subject, hours) VALUES ('Физика',200),('Математика',120),('Основы алгоритмизации',70),('Проектирование БД',130),('Средства визуального программирования ',90),('Объектно-ориентированное программирование',70);
+INSERT INTO Students(name, surname, last_name, birthday, id_group) VALUES 
+('П.', 'Федоренко', 'Р.', '1997-12-25', 1),('О.', 'Зингел', NULL, '1985-12-25', 1),
+('Н.', 'Савицкая', NULL, '1987-09-22', 2),('М.', 'Ковальчук', 'Е.', '1992-06-17', 2),
+('Т.', 'Ковриго', 'Р.', '1992-05-13', 3),('Н.', 'Шарапо', NULL, '1992-08-14', 3);
+INSERT INTO Plans (id_group, id_subject) VALUES (1, 1),(1, 2);
+INSERT INTO Plans (id_group, id_subject) VALUES (2, 3),(2, 4); 
+INSERT INTO Plans (id_group, id_subject) VALUES (3, 5),(3, 6); 
+
+UPDATE Groups SET group_name='ПО134' where id_group=1;
+
+DELETE FROM Groups WHERE group_name=135;--работает но данных таких нет
+
+UPDATE Subjects SET hours=hours+30 where id_subject in (5,6);
+
+ALTER TABLE Subjects ADD control_form varchar(25);
+UPDATE Subjects SET control_form = 'зачет' WHERE name_subject = 'Основы алгоритмизации';
+UPDATE Subjects SET control_form = 'экзамен' WHERE name_subject <> 'Основы алгоритмизации';
+
+ALTER TABLE Students DROP COLUMN last_name;
