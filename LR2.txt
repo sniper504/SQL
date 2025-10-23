@@ -1,7 +1,6 @@
-Артхаус, [06.10.2025 22:21]
+
 create database LAB_1_2_Test_1
 use LAB_1_2_Test_1
-
 
 create table Subjects (
     id_subject int PRIMARY KEY IDENTITY(1,1),
@@ -9,13 +8,11 @@ create table Subjects (
     hours int not null,
 );
 
-
 create table Groups (
     id_group int PRIMARY KEY IDENTITY(1,1),
     group_name varchar(50) not null,
     course int not null
 );
-
 
 create table stud (
     id int not null IDENTITY(1,1),
@@ -35,7 +32,6 @@ create table stud (
     FOREIGN KEY (id_group) REFERENCES Groups(id_group)
 );
 
-
 create table teach (
     id int not null identity(1,1),
     last_name nvarchar(25) not null,
@@ -51,7 +47,6 @@ create table teach (
     CONSTRAINT PK_teach PRIMARY KEY (id)
 );
 
-
 create table Plans (
     id_group int not null,
     id_subject int not null,
@@ -60,12 +55,10 @@ create table Plans (
     FOREIGN KEY (id_subject) REFERENCES Subjects(id_subject)
 );
 
-
 insert into Groups(group_name, course) VALUES ('ПО135',1),('ПО235',2),('ПО335',3);
 insert into Subjects(name_subject, hours) VALUES 
 ('Физика',200),('Математика',120),('Основы алгоритмизации',70),
 ('Проектирование БД',130),('Средства визуального программирования ',90),('Объектно-ориентированное программирование',70);
-
 
 insert into stud 
 (last_name,f_name,s_name,form,faculty,year,all_h,inclass_h,br_date,in_date,exm,id_group) values
@@ -90,7 +83,6 @@ insert into stud
 (N'Сафроненко',N'Н',N'Л',N'заочная',N'ФПМ',3,370,130, '19920525','20140901',7.7,1),
 (N'Зайцева',N'Т',N'Я',N'заочная',N'ФПМ',3,370,130,'19940725','20140901',5.6,2);
 
-Артхаус, [06.10.2025 22:21]
 insert into teach 
 (last_name, f_name, s_name, subj, form, faculty, year, hours, br_date, start_work_date) VALUES
 (N'Скворцов',N'К',null,N'Дифференциальные исчисления',N'очная',N'ФПМ',1,150,'19831212','20160901'),
@@ -109,11 +101,9 @@ insert into teach
 (N'Зуров',N'П',null,N'Социология',N'очная',N'ФПМ',3,50,'19780712','20160901'),
 (N'Сидоренко',N'Л',N'К',N'Методы машинного обучения',N'очная',N'ФПМ',3,150,'19831212','20160901');
 
-
 INSERT INTO Plans (id_group, id_subject) VALUES (1, 1),(1, 2);
 INSERT INTO Plans (id_group, id_subject) VALUES (2, 3),(2, 4); 
 INSERT INTO Plans (id_group, id_subject) VALUES (3, 5),(3, 6);
-
 
 UPDATE Groups SET group_name='ПО134' WHERE id_group=1;
 DELETE FROM Groups WHERE group_name=135;
@@ -124,8 +114,6 @@ ALTER TABLE Subjects ADD contrfm varchar(25);
 UPDATE Subjects SET contrfm = 'зачет' WHERE name_subject = 'Основы алгоритмизации';
 UPDATE Subjects SET contrfm = 'экзамен' WHERE name_subject <> 'Основы алгоритмизации';
 ALTER TABLE stud DROP COLUMN s_name;
-
-----------------------------------------------------------------------------------------
 
 select last_name from stud where last_name like '%б%' or last_name like '%о%';
 select * from stud where last_name like 'К%' and s_name is null;
@@ -144,14 +132,8 @@ where g.course = 3
 
 
 select year, form, concat(f_name, ' ', last_name) as full_name, subj, hours from teach where faculty = 'ФПК' and hours > 100;
-
 select faculty, year, form, concat(f_name, ' ', last_name) as full_name, subj from teach where s_name is null;
-
 select last_name, f_name, s_name, br_date from teach where datediff(year, br_date, getdate()) > 30;
-
 select last_name, f_name, s_name, br_date from teach where datediff(year, br_date, getdate()) between 35 and 40 order by last_name;
-
 select last_name, f_name, s_name, br_date from teach where month(br_date) = 10 order by br_date asc;
-
-Артхаус, [06.10.2025 22:21]
 select form, last_name, f_name, s_name, subj, hours from teach where faculty = 'ФПК' order by form, last_name;  --7
