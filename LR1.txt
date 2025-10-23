@@ -1,15 +1,38 @@
+CREATE DATABASE LR_1;
+
+/*d)    Таблица SUBJECTS содержащая поля
+- идентификатор предмета
+- наименование предмета
+- количество часов по предмету
+поле идентификатора предмета должно быть первичным ключом в таблице*/
 CREATE TABLE Subjects (
     id_subject int PRIMARY KEY IDENTITY(1,1),
     name_subject varchar(100) not null,
     hours int not null
 );
 
+
+/*b)    Таблица GROUPS содержащая поля
+- идентификатор группы
+- наименование
+- курс
+поле идентификатора группы должно быть первичным ключом в таблице*/
 CREATE TABLE Groups (
     id_group int PRIMARY KEY IDENTITY(1,1),
     group_name varchar(50) not null,
     course int not null
 );
 
+
+/*1) Создайте следующие таблицы
+a)  таблица STUDENTS  содержащая поля
+- идентификатор студента
+- имя
+-фамилию
+-отчество
+- дату рождения
+-идентификатор группы
+поле идентификатора студента должно быть первичным ключом в таблице*/
 CREATE TABLE Students (
     id_student int PRIMARY KEY IDENTITY(1000,1),
     name varchar(20) not null,
@@ -21,6 +44,10 @@ CREATE TABLE Students (
 );
 
 
+/*c)    Таблица PLAN содержащая поля
+- идентификатор группы
+- идентификатор предмета
+Все поля образуют первичный ключ*/
 CREATE TABLE Plans (
     id_group int not null,
     id_subject int not null,
@@ -29,9 +56,21 @@ CREATE TABLE Plans (
     FOREIGN KEY (id_subject) REFERENCES Subjects(id_subject)
 );
 
+/*2. Измените таблицы, создав связи между ними
+- STUDENTS.идентификатор группы -- GROUPS.идентификатор группы
+- PLAN.идентификатор предмета --SUBJECTS.идентификатор предмета
+- PLAN.идентификатор группы --GROUPS.идентификатор группы
+insert into Groups(group_name, course) VALUES ('ПО135',1),('ПО235',2),('ПО335',3);*/
 
-insert into Groups(group_name, course) VALUES ('ПО135',1),('ПО235',2),('ПО335',3);
-insert into Subjects(name_subject, hours) VALUES ('Физика',200),('Математика',120),('Основы алгоритмизации',70),('Проектирование БД',130),('Средства визуального программирования ',90),('Объектно-ориентированное программирование',70);
+INSERT INTO Groups(group_name, course) VALUES ('ПО135',1),('ПО235',2),('ПО335',3);
+
+INSERT INTO Subjects(name_subject, hours) VALUES ('Физика',200),('Математика',120),('Основы алгоритмизации',70),('Проектирование БД',130),('Средства визуального программирования ',90),('Объектно-ориентированное программирование',70);
+
+/*3. Заполнить таблицы согласно данным Таблицы 1.1 и Таблицы 1.2
+Таблица 1.1
+ФИО дата рождения   Номер группы    Курс
+Таблица 1.2
+Предмет Курс    Количество часов*/
 INSERT INTO Students(name, surname, last_name, birthday, id_group) VALUES 
 ('П.', 'Федоренко', 'Р.', '1997-12-25', 1),('О.', 'Зингел', NULL, '1985-12-25', 1),
 ('Н.', 'Савицкая', NULL, '1987-09-22', 2),('М.', 'Ковальчук', 'Е.', '1992-06-17', 2),
@@ -40,14 +79,26 @@ INSERT INTO Plans (id_group, id_subject) VALUES (1, 1),(1, 2);
 INSERT INTO Plans (id_group, id_subject) VALUES (2, 3),(2, 4); 
 INSERT INTO Plans (id_group, id_subject) VALUES (3, 5),(3, 6); 
 
+/*4) В таблице STUDENTS внесите изменения таким образом, чтобы все студенты, учащиеся в группе ПО135, числились в группе 134.*/
 UPDATE Groups SET group_name='ПО134' where id_group=1;
 
-DELETE FROM Groups WHERE group_name=135;--работает но данных таких нет
+UPDATE Students
+SET id_group = (SELECT id_group FROM Groups WHERE group_name = 'ПО134')
+WHERE id_group = (SELECT id_group FROM Groups WHERE group_name = 'ПО135');
 
-UPDATE Subjects SET hours=hours+30 where id_subject in (5,6);
+/*5) Из таблицы групп удалите запись о группе по 135*/
+DELETE FROM Groups WHERE group_name = 'ПО135';
 
+/*6) в таблице SUBJECTS увеличьте количество часов на 30 для предметов Средства визуального программирования, Объектно-ориентированное программирование  */
+UPDATE Subjects SET hours=hours+30 where name_subject IN ('Средства визуального программирования', 'Объектно-ориентированное программирование');
+
+/* 7)в таблицу SUBJECTS добавьте столбец, в который будут внесены данные для формы контроля по предметам 
+(по всем предметам сдаются экзамены, кроме "Основы алгоритмизации" -зачет). Обновите таблицу SUBJECTS с учетом форм контроля по предметам.*/
 ALTER TABLE Subjects ADD control_form varchar(25);
+
 UPDATE Subjects SET control_form = 'зачет' WHERE name_subject = 'Основы алгоритмизации';
+
 UPDATE Subjects SET control_form = 'экзамен' WHERE name_subject <> 'Основы алгоритмизации';
 
+/*8) Из таблицы STUDENTS  удалите столбцы с данными отчества.*/
 ALTER TABLE Students DROP COLUMN last_name;
