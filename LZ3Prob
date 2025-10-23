@@ -1,0 +1,99 @@
+SELECT last_name, f_name, faculty, year
+FROM stud
+WHERE form = N'заочная'
+  AND DATEDIFF(year, br_date, GETDATE()) < 37;
+
+SELECT faculty, COUNT(*) AS cnt_students
+FROM stud
+GROUP BY faculty;
+
+SELECT form, COUNT(*) AS cnt_students
+FROM stud
+GROUP BY form;
+
+-- возраст на 31 декабря текущего года, формируем дату через конкатенацию (CONCAT в вашем скрипте встречается)
+SELECT faculty,
+       AVG(DATEDIFF(year, br_date, CONVERT(date, CONCAT(YEAR(GETDATE()), '-12-31')))) AS avg_age_years
+FROM stud
+GROUP BY faculty;
+
+-- В вашем скрипте s_name удалён, поэтому считаем "без отчества" по NULL в s_name если поле есть.
+-- Если s_name отсутствует — используйте критерий, который у вас принят за признак иностранца.
+SELECT last_name, f_name, br_date, in_date, faculty, year AS course, form
+FROM stud
+WHERE EXISTS (
+    SELECT 1
+    FROM sys.columns c
+    WHERE c.object_id = OBJECT_ID('stud') AND c.name = 's_name'
+)
+AND s_name IS NULL;
+
+SELECT faculty
+FROM (
+    SELECT faculty, COUNT(*) AS cnt_2015
+    FROM stud
+    WHERE YEAR(in_date) = 2015
+    GROUP BY faculty
+) AS t
+WHERE cnt_2015 = (
+    SELECT MAX(cnt_2015)
+    FROM (
+        SELECT COUNT(*) AS cnt_2015
+        FROM stud
+        WHERE YEAR(in_date) = 2015
+        GROUP BY faculty
+    ) AS t2
+);
+
+SELECT faculty, form, COUNT(*) AS cnt_2014
+FROM stud
+WHERE YEAR(in_date) = 2014
+GROUP BY faculty, form;
+
+SELECT DISTINCT faculty
+FROM stud
+WHERE form = N'заочная';
+
+SELECT DISTINCT faculty, form, year AS course
+FROM stud
+ORDER BY faculty, form, year;
+
+SELECT faculty, form, COUNT(*) AS cnt
+FROM stud
+GROUP BY faculty, form
+ORDER BY faculty, form;
+
+SELECT faculty, form,
+       SUM(CASE WHEN year IN (1,3) THEN 1 ELSE 0 END) AS cnt_first_and_third
+FROM stud
+GROUP BY faculty, form;
+
+SELECT faculty, year AS course, COUNT(*) AS cnt_foreign
+FROM stud
+WHERE EXISTS (
+    SELECT 1 FROM sys.columns c WHERE c.object_id = OBJECT_ID('stud') AND c.name = 's_name'
+) AND s_name IS NULL
+GROUP BY faculty, year
+ORDER BY faculty, year;
+
+SELECT faculty, year AS course, COUNT(*) AS cnt_students
+FROM stud
+WHERE exm > 7.5
+GROUP BY faculty, year
+ORDER BY faculty, year;
+
+SELECT faculty, form, COUNT(*) AS cnt_over_45
+FROM stud
+WHERE DATEDIFF(year, br_date, GETDATE()) > 45
+GROUP BY faculty, form;
+
+SELECT faculty, form, year AS course, COUNT(*) AS cnt_under_27
+FROM stud
+WHERE DATEDIFF(year, br_date, GETDATE()) < 27
+GROUP BY faculty, form, year
+ORDER BY faculty, form, year;
+
+SELECT faculty, COUNT(*) AS cnt_last_C
+FROM stud
+WHERE last_name LIKE N'С%'
+GROUP BY faculty;
